@@ -1,8 +1,12 @@
+hadoop_ver := 2.7.2
+hive_ver := 2.1.1
+spark_ver := 2.0.0
+
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(dir $(mkfile_path))
-hive_home := $(addsuffix tools/apache-hive-2.1.0-bin, $(current_dir))
-hadoop_home := $(addsuffix tools/hadoop-2.7.2, $(current_dir))
-spark_home := $(addsuffix tools/spark-2.0.0-bin, $(current_dir))
+hive_home := $(addsuffix tools/apache-hive-$(hive_ver)-bin, $(current_dir))
+hadoop_home := $(addsuffix tools/hadoop-$(hadoop_ver), $(current_dir))
+spark_home := $(addsuffix tools/spark-$(spark_ver)-bin, $(current_dir))
 
 #########################################
 # Configuration and start/stop commands #
@@ -12,15 +16,15 @@ download: download_hadoop download_spark download_hive
 
 download_hadoop:
 	mkdir -p ${current_dir}tools
-	cd ${current_dir}tools; wget http://www-us.apache.org/dist/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz && tar -xvf hadoop-2.7.2.tar.gz && rm -rf hadoop-2.7.2.tar.gz
+	cd ${current_dir}tools; wget http://www-us.apache.org/dist/hadoop/common/hadoop-$(hadoop_ver)/hadoop-$(hadoop_ver).tar.gz && tar -xvf hadoop-$(hadoop_ver).tar.gz && rm -rf hadoop-$(hadoop_ver).tar.gz
 
 download_spark:
 	mkdir -p ${current_dir}tools
-	cd ${current_dir}tools; wget https://dl.dropboxusercontent.com/u/4882345/packages/spark-2.0.0-bin.tgz && tar -xvf spark-2.0.0-bin.tgz && rm -rf spark-2.0.0-bin.tgz
+	cd ${current_dir}tools; wget https://dl.dropboxusercontent.com/u/4882345/packages/spark-$(spark_ver)-bin.tgz && tar -xvf spark-$(spark_ver)-bin.tgz && rm -rf spark-$(spark_ver)-bin.tgz
 
 download_hive:
 	mkdir -p ${current_dir}tools
-	cd ${current_dir}tools; wget http://www-us.apache.org/dist/hive/hive-2.1.0/apache-hive-2.1.0-bin.tar.gz && tar -xvf apache-hive-2.1.0-bin.tar.gz && rm -rf apache-hive-2.1.0-bin.tar.gz
+	cd ${current_dir}tools; wget http://www-us.apache.org/dist/hive/hive-$(hive_ver)/apache-hive-$(hive_ver)-bin.tar.gz && tar -xvf apache-hive-$(hive_ver)-bin.tar.gz && rm -rf apache-hive-$(hive_ver)-bin.tar.gz
 
 configure: configure_hadoop configure_spark
 
@@ -101,7 +105,7 @@ start_hive_beeline_client:
 	${hive_home}/bin/beeline -u jdbc:hive2://localhost:10000
 start_hive_postgres_metastore:
 	echo "Starting postgres docker container"
-	docker run -d --name hive-metastore -p 5432:5432 earthquakesan/hive-metastore-postgresql:2.1.0
+	docker run -d --name hive-metastore -p 5432:5432 earthquakesan/hive-metastore-postgresql:$(hive_ver)
 	sleep 5;
 	echo "Running Hive Metastore service"
 	${hive_home}/bin/hive --service metastore
